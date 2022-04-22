@@ -77,7 +77,9 @@ void inFile(Stack*& stk)
 	}
 	while (temp != NULL)
 	{
-		fout << temp->number << " ";
+		fout << temp->number;
+		if (temp->next != NULL)
+			fout << " ";
 		temp = temp->next;
 	}
 	cout << "write in file\n";
@@ -93,17 +95,23 @@ void outFile(Stack*& stk)
 		cout << "impossible to open\n";
 		exit(1);
 	}
+	
 	while (!fin.eof())
 	{
 		Stack* temp = new Stack;
 		char x[10];
 		fin >> x;
-		cout << x<<" ";
-		temp->number=atoi(x);
-		cout << temp->number << " ";
-		temp = temp->next;
-		stk = temp;
-		stk->next;
+		temp->number = atoi(x);
+		temp->next = NULL;
+		if (stk == NULL)
+			stk = temp;
+		else
+		{
+			Stack* t = stk;
+			while (t->next != NULL)
+				t = t->next;
+			t->next = temp;
+		}
 	}
 	cout << "\nwrite out file\n";
 	fin.close();
