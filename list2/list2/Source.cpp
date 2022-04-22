@@ -11,7 +11,7 @@ struct Address
 	Address* next;
 	Address* prev;
 };
-//-----------------------------------------------------------
+
 int menu(void)
 {
 	char s[80];  int c;
@@ -20,7 +20,8 @@ int menu(void)
 	cout << "2. Удаление имени" << endl;
 	cout << "3. Вывод на экран" << endl;
 	cout << "4. Поиск" << endl;
-	cout << "5. Выход" << endl;
+	cout << "5. Удаление каждого M" << endl;
+	cout << "6. Выход" << endl;
 	cout << endl;
 	do
 	{
@@ -32,7 +33,7 @@ int menu(void)
 	} while (c < 0 || c > 5);
 	return c;
 }
-//-----------------------------------------------------------
+
 void insert(Address* e, Address** phead, Address** plast) //Добавление в конец списка
 {
 	Address* p = *plast;
@@ -52,7 +53,7 @@ void insert(Address* e, Address** phead, Address** plast) //Добавление в конец с
 		*plast = e;
 	}
 }
-//-----------------------------------------------------------
+
 Address* setElement()      // Создание элемента и ввод его значений с клавиатуры 
 {
 	Address* temp = new  Address();
@@ -73,7 +74,7 @@ Address* setElement()      // Создание элемента и ввод его значений с клавиатуры
 	temp->prev = NULL;
 	return temp;
 }
-//-----------------------------------------------------------
+
 void outputList(Address** phead, Address** plast)      //Вывод списка на экран
 {
 	Address* t = *phead;
@@ -84,7 +85,7 @@ void outputList(Address** phead, Address** plast)      //Вывод списка на экран
 	}
 	cout << "" << endl;
 }
-//-----------------------------------------------------------
+
 void find(char name[NAME_SIZE], Address** phead)    // Поиск имени в списке
 {
 	Address* t = *phead;
@@ -98,7 +99,7 @@ void find(char name[NAME_SIZE], Address** phead)    // Поиск имени в списке
 	else
 		cout << t->name << ' ' << t->city << endl;
 }
-//-----------------------------------------------------------
+
 void delet(char name[NAME_SIZE], Address** phead, Address** plast)  // Удаление имени
 {
 	struct Address* t = *phead;
@@ -131,42 +132,37 @@ void delet(char name[NAME_SIZE], Address** phead, Address** plast)  // Удаление 
 		cout << "Элемент удален" << endl;
 	}
 }
-//-----------------------------------------------------------
-int main(void)
+
+void deleteEveryM(Address** phead, Address** plast, int m)
 {
-	Address* head = NULL;
-	Address* last = NULL;
-	setlocale(LC_CTYPE, "Rus");
-	while (true)
+	struct Address* t = *phead;
+	int i = 0;
+	while (t)
 	{
-		switch (menu())
+		for (int i = 1; !t; i++)
 		{
-		case 1:  insert(setElement(), &head, &last);
-			break;
-		case 2: {	  char dname[NAME_SIZE];
-			cout << "Введите имя: ";
-			cin.getline(dname, NAME_SIZE - 1, '\n');
-			cin.ignore(cin.rdbuf()->in_avail());
-			cin.sync();
-			delet(dname, &head, &last);
+			if (i % m == 0)
+			{
+				*phead = t->next;
+				if (*phead)
+					(*phead)->prev = NULL;
+				else
+					*plast = NULL;
+			}
+			else
+			{
+				t->prev->next = t->next;
+				if (t != *plast)
+					t->next->prev = t->prev;
+				else
+					*plast = t->prev;
+			}
 		}
-			  break;
-		case 3:  outputList(&head, &last);
-			break;
-		case 4: {	  char fname[NAME_SIZE];
-			cout << "Введите имя: ";
-			cin.getline(fname, NAME_SIZE - 1, '\n');
-			cin.ignore(cin.rdbuf()->in_avail());
-			cin.sync();
-			find(fname, &head);
-		}
-			  break;
-		case 5:  exit(0);
-		default: exit(1);
-		}
+		delete t;
+		cout << "Элементы удалены" << endl;
 	}
-	return 0;
 }
+
 void writeToFile(Address** phead)       //Запись в файл
 {
 	struct Address* t = *phead;
@@ -185,7 +181,7 @@ void writeToFile(Address** phead)       //Запись в файл
 	}
 	fclose(fp);
 }
-//-----------------------------------------------------------
+
 void readFromFile(Address** phead, Address** plast)          //Считывание из файла
 {
 	struct Address* t;
@@ -217,4 +213,49 @@ void readFromFile(Address** phead, Address** plast)          //Считывание из фай
 	}
 	fclose(fp);
 }
+
+int main(void)
+{
+	Address* head = NULL;
+	Address* last = NULL;
+	setlocale(LC_CTYPE, "Rus");
+	while (true)
+	{
+		switch (menu())
+		{
+		case 1:  insert(setElement(), &head, &last);
+			break;
+		case 2: {	  char dname[NAME_SIZE];
+			cout << "Введите имя: ";
+			cin.getline(dname, NAME_SIZE - 1, '\n');
+			cin.ignore(cin.rdbuf()->in_avail());
+			cin.sync();
+			delet(dname, &head, &last);
+		}
+			  break;
+		case 3:  outputList(&head, &last);
+			break;
+		case 4: {	  char fname[NAME_SIZE];
+			cout << "Введите имя: ";
+			cin.getline(fname, NAME_SIZE - 1, '\n');
+			cin.ignore(cin.rdbuf()->in_avail());
+			cin.sync();
+			find(fname, &head);
+		}
+			  break;
+		case 5: {
+			int m;
+			cout << "write a number ";
+			cin>>m;
+			deleteEveryM(&head, &last, m);
+		}
+		case 6:  exit(0);
+		default: exit(1);
+		}
+	}
+	return 0;
+}
+
+
+
 
