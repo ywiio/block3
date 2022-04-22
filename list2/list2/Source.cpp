@@ -133,34 +133,48 @@ void delet(char name[NAME_SIZE], Address** phead, Address** plast)  // Удаление 
 	}
 }
 
-void deleteEveryM(Address** phead, Address** plast, int m)
+void deleteEveryM(Address*& phead, Address*& plast, int m)
 {
-	struct Address* t = *phead;
-	int i = 0;
-	while (t)
+	Address* t = phead;
+	int i = 1;
+	while (t != NULL)
 	{
-		for (int i = 1; !t; i++)
+		if (i % m != 0)
+		{
+			t = t->next;
+			i++;
+		}
+		else
+		{
+			Address* temp;
+			temp = t;
+			t->prev->next = t->next;
+			if(t->next!=NULL)
+			t->next->prev = t->prev;
+			t = t->next;
+			delete temp;
+			i = 1;
+		}
+	}
+
+		/*for (int i = 2; t1 !=plast->next; i++)
 		{
 			if (i % m == 0)
 			{
-				*phead = t->next;
-				if (*phead)
-					(*phead)->prev = NULL;
-				else
-					*plast = NULL;
+				Address* temp;
+				temp = t->next;
+				t->next = t1->next;
+				delete temp;
 			}
 			else
 			{
-				t->prev->next = t->next;
-				if (t != *plast)
-					t->next->prev = t->prev;
-				else
-					*plast = t->prev;
+				t = t->next;
+				t1 = t1->next;
 			}
-		}
-		delete t;
+		}*/
+	delete t;
 		cout << "Элементы удалены" << endl;
-	}
+	
 }
 
 void writeToFile(Address** phead)       //Запись в файл
@@ -247,10 +261,11 @@ int main(void)
 			int m;
 			cout << "write a number ";
 			cin>>m;
-			deleteEveryM(&head, &last, m);
+			deleteEveryM(head,  last, m);
+			break;
 		}
-		case 6:  exit(0);
-		default: exit(1);
+		//case 6:  //exit(0);
+		//default: //exit(1);
 		}
 	}
 	return 0;
